@@ -1,6 +1,6 @@
 {
   "name": "react-app-auth",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "React authentication using React Context, Hooks and oidc-client-js",
   "main": "dist/main/index.js",
   "module": "dist/module/index.js",
