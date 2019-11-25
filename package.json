@@ -1,0 +1,35 @@
+{
+  "name": "react-app-auth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/main/index.js",
+  "module": "dist/module/index.js",
+  "types": "dist/main/index.d.ts",
+  "scripts": {
+    "build-main": "yarn tsc",
+    "build-module": "yarn tsc -p tsconfig.module.json",
+    "build": "rimraf dist && yarn build-main && yarn build-module"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sorenhoyer/react-app-auth.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sorenhoyer/react-app-auth/issues"
+  },
+  "homepage": "https://github.com/sorenhoyer/react-app-auth#readme",
+  "devDependencies": {
+    "@types/react": "^16.9.13",
+    "oidc-client": "^1.9.1",
+    "react": "^16.12.0",
+    "rimraf": "^3.0.0",
+    "typescript": "^3.7.2"
+  },
+  "peerDependencies": {
+    "oidc-client": ">= 1.9.1",
+    "react": ">= 16.12.0",
+    "typescript": ">= 3.7.2"
+  }
+}
