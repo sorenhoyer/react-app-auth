@@ -1,3 +1,4 @@
+import React from 'react';
 import { SigninRequest, User, UserManagerSettings } from 'oidc-client';
 
 export interface ContextProps {
@@ -15,4 +16,20 @@ export interface ProviderProps {
   settings: UserManagerSettings;
   accessTokenStorageKey: string;
   idTokenStorageKey: string;
+}
+
+export interface CallbackProps {
+  fallback?: (() => React.ReactNode) | React.ReactNode;
+}
+
+export interface LogoutProps {
+  fallback?: (() => React.ReactNode) | React.ReactNode;
+}
+
+export interface LogoutCallbackProps {
+  fallback?: (() => React.ReactNode) | React.ReactNode;
+}
+
+export interface SilentRenewProps {
+  fallback?: (() => React.ReactNode) | React.ReactNode;
 }
