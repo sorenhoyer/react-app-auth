@@ -13,8 +13,8 @@ class Service {
 
   public postSignoutRedirectCallbackUri?: string;
 
-  constructor(settings: UserManagerSettings, accessTokenStorageKey: string, idTokenStorageKey: string, postSignoutRedirectCallbackUri?: string) {
-    this.UserManager = new UserManager(settings);
+  constructor(userManagerSettings: UserManagerSettings, accessTokenStorageKey: string, idTokenStorageKey: string, postSignoutRedirectCallbackUri?: string) {
+    this.UserManager = new UserManager(userManagerSettings);
     this.accessTokenStorageKey = accessTokenStorageKey;
     this.idTokenStorageKey = idTokenStorageKey;
     this.postSignoutRedirectCallbackUri = postSignoutRedirectCallbackUri;

@@ -13,7 +13,7 @@ export interface ContextProps {
 }
 
 export interface ProviderProps {
-  settings: UserManagerSettings;
+  userManagerSettings: UserManagerSettings;
   accessTokenStorageKey: string;
   idTokenStorageKey: string;
   postSignoutRedirectCallbackUri?: string;
