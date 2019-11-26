@@ -16,6 +16,7 @@ export interface ProviderProps {
   settings: UserManagerSettings;
   accessTokenStorageKey: string;
   idTokenStorageKey: string;
+  postSignoutRedirectCallbackUri?: string;
 }
 
 export interface CallbackProps {

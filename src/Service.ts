@@ -11,10 +11,13 @@ class Service {
 
   public idTokenStorageKey: string;
 
-  constructor(settings: UserManagerSettings, accessTokenStorageKey: string, idTokenStorageKey: string) {
+  public postSignoutRedirectCallbackUri?: string;
+
+  constructor(settings: UserManagerSettings, accessTokenStorageKey: string, idTokenStorageKey: string, postSignoutRedirectCallbackUri?: string) {
     this.UserManager = new UserManager(settings);
     this.accessTokenStorageKey = accessTokenStorageKey;
     this.idTokenStorageKey = idTokenStorageKey;
+    this.postSignoutRedirectCallbackUri = postSignoutRedirectCallbackUri;
 
     Log.logger = console;
     Log.level = Log.DEBUG;
@@ -30,7 +33,9 @@ class Service {
         idToken: this.idToken,
       });
 
-      if (window.location.href.indexOf('callback') !== -1) {
+      const path = window.location.pathname;
+
+      if (path.indexOf('callback') !== -1 && path.indexOf('logout/callback') === -1) {
         this.navigateToScreen();
       }
     });
@@ -132,7 +137,7 @@ class Service {
   public signoutRedirectCallback = (): void => {
     this.UserManager.signoutRedirectCallback().then(() => {
       sessionStorage.clear();
-      window.location.replace('');
+      if (this.postSignoutRedirectCallbackUri) window.location.replace(this.postSignoutRedirectCallbackUri);
     });
 
     this.UserManager.clearStaleState();
