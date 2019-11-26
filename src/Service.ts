@@ -1,6 +1,6 @@
 import { Log, SigninRequest, User, UserManager, UserManagerSettings } from 'oidc-client';
 
-class AuthService {
+class Service {
   public UserManager: UserManager;
 
   public accessToken?: string;
@@ -132,11 +132,11 @@ class AuthService {
   public signoutRedirectCallback = (): void => {
     this.UserManager.signoutRedirectCallback().then(() => {
       sessionStorage.clear();
-      window.location.replace(this.UserManager.settings?.post_logout_redirect_uri ?? '');
+      window.location.replace('');
     });
 
     this.UserManager.clearStaleState();
   };
 }
 
-export default AuthService;
+export default Service;
