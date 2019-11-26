@@ -123,7 +123,7 @@ class Service {
 
   public logout = (): void => {
     this.UserManager.signoutRedirect({
-      id_token_hint: sessionStorage.getItem('id_token'),
+      id_token_hint: sessionStorage.getItem(this.idTokenStorageKey),
     });
 
     this.UserManager.clearStaleState();
