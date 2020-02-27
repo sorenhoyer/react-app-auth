@@ -36,3 +36,6 @@ node_modules/
 .yarn-integrity
 
 dist/
+
+.yalc
+yalc.lock
