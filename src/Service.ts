@@ -3,36 +3,16 @@ import { Log, SigninRequest, User, UserManager, UserManagerSettings } from 'oidc
 class Service {
   public UserManager: UserManager;
 
-  public accessToken?: string;
-
-  public idToken?: string;
-
-  public accessTokenStorageKey: string;
-
-  public idTokenStorageKey: string;
-
   public postSignoutRedirectCallbackUri?: string;
 
-  constructor(userManagerSettings: UserManagerSettings, accessTokenStorageKey: string, idTokenStorageKey: string, postSignoutRedirectCallbackUri?: string) {
+  constructor(userManagerSettings: UserManagerSettings, postSignoutRedirectCallbackUri?: string) {
     this.UserManager = new UserManager(userManagerSettings);
-    this.accessTokenStorageKey = accessTokenStorageKey;
-    this.idTokenStorageKey = idTokenStorageKey;
     this.postSignoutRedirectCallbackUri = postSignoutRedirectCallbackUri;
 
     Log.logger = console;
     Log.level = Log.DEBUG;
 
     this.UserManager.events.addUserLoaded(user => {
-      this.accessToken = user.access_token;
-      this.idToken = user.id_token;
-      sessionStorage.setItem(this.accessTokenStorageKey, user.access_token);
-      sessionStorage.setItem(this.idTokenStorageKey, user.id_token);
-
-      this.setUserInfo({
-        accessToken: this.accessToken,
-        idToken: this.idToken,
-      });
-
       const path = window.location.pathname;
 
       if (path.indexOf('callback') !== -1 && path.indexOf('logout/callback') === -1) {
@@ -48,7 +28,7 @@ class Service {
     this.UserManager.events.addAccessTokenExpired(() => {
       // eslint-disable-next-line no-console
       console.log('token expired');
-      this.signinSilent();
+      this.logout();
     });
   }
 
@@ -58,10 +38,11 @@ class Service {
     });
   };
 
-  public getUser = (): Promise<User | null> => {
-    const user = this.UserManager.getUser();
+  public getUser = async (): Promise<User> => {
+    const user = await this.UserManager.getUser();
 
-    if (!user) return this.UserManager.signinRedirectCallback();
+    // eslint-disable-next-line no-return-await
+    if (!user) return await this.UserManager.signinRedirectCallback();
 
     return user;
   };
@@ -73,37 +54,24 @@ class Service {
     return JSON.parse(window.atob(base64));
   };
 
-  public setUserInfo = (authResult: { accessToken: string; idToken: string }): void => {
-    if (this.accessToken && this.idToken) {
-      const data = this.parseJwt(this.idToken);
-      this.setSessionInfo(authResult);
-      this.setUser(data);
-    }
-  };
-
   public signinRedirect = (): void => {
-    sessionStorage.setItem('redirectUri', window.location.pathname);
+    localStorage.setItem('redirectUri', window.location.pathname);
     this.UserManager.signinRedirect({});
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public setUser = (data: any): void => {
-    sessionStorage.setItem('userId', data.sub);
-  };
-
   public navigateToScreen = (): void => {
-    const redirectUri = sessionStorage.getItem('redirectUri');
-    window.location.replace(redirectUri && redirectUri !== null ? redirectUri : '');
-  };
-
-  public setSessionInfo = (authResult: { accessToken: string; idToken: string }): void => {
-    sessionStorage.setItem(this.accessTokenStorageKey, authResult.accessToken);
-    sessionStorage.setItem(this.idTokenStorageKey, authResult.idToken);
+    const redirectUri = localStorage.getItem('redirectUri');
+    window.location.replace(redirectUri || '');
   };
 
   public isAuthenticated = (): boolean => {
-    const accessToken = sessionStorage.getItem(this.accessTokenStorageKey);
-    return !!accessToken;
+    const serializedOidcStorage = sessionStorage.getItem(
+      `oidc.user:${this.UserManager.settings.authority}:${this.UserManager.settings.client_id}`,
+    );
+
+    const oidcStorage = serializedOidcStorage && JSON.parse(serializedOidcStorage);
+
+    return !!oidcStorage && !!oidcStorage.access_token;
   };
 
   public signinSilent = (): void => {
@@ -128,7 +96,8 @@ class Service {
 
   public logout = (): void => {
     this.UserManager.signoutRedirect({
-      id_token_hint: sessionStorage.getItem(this.idTokenStorageKey),
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      id_token_hint: localStorage.getItem('id_token'),
     });
 
     this.UserManager.clearStaleState();
@@ -136,7 +105,7 @@ class Service {
 
   public signoutRedirectCallback = (): void => {
     this.UserManager.signoutRedirectCallback().then(() => {
-      sessionStorage.clear();
+      localStorage.clear();
       if (this.postSignoutRedirectCallbackUri) window.location.replace(this.postSignoutRedirectCallbackUri);
     });
 
